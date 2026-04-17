@@ -1,11 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manga App</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        margin: 0;
+        background: #ffffff;
+        color: #111111;
+      }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 16px;
+      }
+      input {
+        padding: 10px;
+        width: 100%;
+        max-width: 320px;
+        font-size: 16px;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 10px;
+        padding: 10px 14px;
+        font-size: 16px;
+      }
+      pre {
+        white-space: pre-wrap;
+        margin-top: 20px;
+        background: #f5f5f5;
+        padding: 12px;
+        border-radius: 8px;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <h1>映画→漫画プロンプト生成</h1>
+
+    <input id="title" placeholder="映画タイトルを入力" />
+    <br />
+    <button id="generate">生成</button>
+
+    <pre id="result">ここに結果が出ます</pre>
+
+    <script>
+      const button = document.getElementById("generate");
+      const titleInput = document.getElementById("title");
+      const result = document.getElementById("result");
+
+      button.addEventListener("click", async () => {
+        const title = titleInput.value.trim();
+
+        if (!title) {
+          result.textContent = "映画タイトルを入力してください";
+          return;
+        }
+
+        result.textContent = "生成中...";
+
+        try {
+          const res = await fetch("/api/generate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ title })
+          });
+
+          const data = await res.json();
+          result.textContent = data.text || data.error || "結果を取得できませんでした";
+        } catch (error) {
+          result.textContent = "エラーが起きました";
+        }
+      });
+    </script>
   </body>
 </html>
